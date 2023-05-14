@@ -1,0 +1,58 @@
+import tensorflow as tf
+
+# Load the data
+data = tf.keras.datasets.mnist
+(x_train, y_train), (x_test, y_test) = data.load_data()
+
+# Create the model
+model = tf.keras.Sequential([
+  tf.keras.layers.Flatten(input_shape=(28, 28)),
+  tf.keras.layers.Dense(128, activation='relu'),
+  tf.keras.layers.Dense(10, activation='softmax')
+])
+
+# Compile the model
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+# Train the model
+model.fit(x_train, y_train, epochs=10)
+
+# Evaluate the model
+loss, accuracy = model.evaluate(x_test, y_test)
+print('Test loss:', loss)
+print('Test accuracy:', accuracy)
+
+# Create the chatbot
+chatbot = tf.keras.models.Sequential([
+  tf.keras.layers.Embedding(10000, 128),
+  tf.keras.layers.LSTM(128),
+  tf.keras.layers.Dense(10, activation='softmax')
+])
+
+# Compile the chatbot
+chatbot.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+# Train the chatbot
+chatbot.fit(x_train, y_train, epochs=10)
+
+# Evaluate the chatbot
+loss, accuracy = chatbot.evaluate(x_test, y_test)
+print('Test loss:', loss)
+print('Test accuracy:', accuracy)
+
+# Use the chatbot
+while True:
+  # Get the user's input
+  input = input('What would you like to code? ')
+
+  # Encode the user's input
+  encoded_input = tf.keras.preprocessing.text.one_hot(input, 10000)
+
+  # Predict the chatbot's response
+  response = chatbot.predict(encoded_input)[0]
+
+  # Decode the chatbot's response
+  decoded_response = tf.keras.preprocessing.text.decode_word_index(response, 10000)
+
+  # Print the chatbot's response
+  print('The chatbot says:', decoded_response)
